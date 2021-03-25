@@ -85,7 +85,7 @@ def main():
                 col = location[0]//SQ_SIZE #to get col, integer divide x coord on board w size of each square 
                 row = location[1]//SQ_SIZE #to get row, integer divide y coord on board w size of each square 
                 if sqSelected == (row,col): #user clicked same square twice, so unselect
-                    spSelected = () #deselect
+                    sqSelected = () #deselect
                     playerClicks = [] #clear player clicks
                 else:
                     sqSelected = (row,col)
