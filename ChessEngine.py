@@ -28,17 +28,55 @@ class GameState():
         self.inCheck = False
         self.pins = []
         self.checks = []
+        self.checkMate = False
+        self.staleMate = False
 
     
     '''
     Takes move as a parameter, executes it (doesn't work for castling, en passant, pawn promotion)
     '''
     def makeMove(self, move):
-        self.board[move.startRow][move.startCol] = "--"
         self.board[move.endRow][move.endCol] = move.pieceMoved
+        self.board[move.startRow][move.startCol] = "--"
         self.moveLog.append(move) #log move to undo later or display game
         #print(self.moveLog)
         self.whiteToMove = not self.whiteToMove #next person's turn
+        #update king's position
+        promotionPiece = ''
+        if move.pieceMoved == 'wK':
+            self.whiteKingLocation = (move.endRow, move.endCol)
+        elif move.pieceMoved == 'bK':
+            self.blackKingLocation = (move.endRow, move.endCol)
+        if move.pieceMoved == 'wP' and move.endRow == 0:
+            while(promotionPiece == ''):
+                promotionPiece = input('\n What would you like to promote to? NOTE: You CAN NOT undo a promotion! \n')
+                if(promotionPiece == 'Q'):
+                    self.board[move.endRow][move.endCol] = 'wQ'
+                elif(promotionPiece == 'N'):
+                    self.board[move.endRow][move.endCol] = 'wN'
+                elif(promotionPiece == 'B'):
+                    self.board[move.endRow][move.endCol] = 'wB'
+                elif(promotionPiece == 'R'):
+                    self.board[move.endRow][move.endCol] = 'wR'
+                else:
+                    promotionPiece = ''
+                    print('invalid input, try again')
+            
+        elif move.pieceMoved == 'bP' and move.endRow == 7:
+            while(promotionPiece == ''):
+                promotionPiece = input('\n What would you like to promote to? NOTE: You CAN NOT undo a promotion! \n')
+                if(promotionPiece == 'Q'):
+                    self.board[move.endRow][move.endCol] = 'bQ'
+                elif(promotionPiece == 'N'):
+                    self.board[move.endRow][move.endCol] = 'bN'
+                elif(promotionPiece == 'B'):
+                    self.board[move.endRow][move.endCol] = 'bB'
+                elif(promotionPiece == 'R'):
+                    self.board[move.endRow][move.endCol] = 'bR'
+                else:
+                    promotionPiece = ''
+                    print('invalid input, try again')
+            
         
     '''
     Undo last move
@@ -49,6 +87,13 @@ class GameState():
             self.board[move.startRow][move.startCol] = move.pieceMoved
             self.board[move.endRow][move.endCol] = move.pieceCaptured 
             self.whiteToMove = not self.whiteToMove #prev person's turn
+            #update king's position
+            if move.pieceMoved == 'wK':
+                self.whiteKingLocation = (move.endRow, move.endCol)
+            elif move.pieceMoved == 'bK':
+                self.blackKingLocation = (move.endRow, move.endCol)
+            self.checkMate = False
+            self.staleMate = False
         
     '''
     All moves considering checks
@@ -66,6 +111,7 @@ class GameState():
         if self.inCheck:
             if len(self.checks) == 1: #if only 1 check, look for blocks
                 moves = self.getAllPossibleMoves()
+                #print(moves)
                 #to block a check, must move piece into square between enemy piece and king
                 check = self.checks[0] # get check info
                 checkRow = check[0]
@@ -88,9 +134,31 @@ class GameState():
                             moves.remove(moves[i])
             else: #double check, so king has to move
                 self.getKingMoves(kingRow, kingCol, moves)
+            #print(len(moves))
+            if(len(moves) == 0):
+                #print(1)
+                self.checkMate = True
         else: #when not in check, all moves are good
-            self.getAllPossibleMoves()
-                    
+            moves = self.getAllPossibleMoves()
+            if(len(moves) == 0):
+                self.staleMate = True
+            #print(moves)
+        #print(moves)    
+        return moves
+        
+    '''
+    All moves not considering checks
+    '''
+    def getAllPossibleMoves(self):
+        moves = []
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                turn = self.board[i][j][0]
+                if(turn == 'w' and self.whiteToMove) or (turn == 'b' and not self.whiteToMove):
+                    piece = self.board[i][j][1]
+                    self.moveFunctions[piece](i,j,moves) #calls respective function based on piece
+        #print(moves)
+        return moves           
         
     '''
     Looks for all possible pins and checks on king
@@ -126,7 +194,7 @@ class GameState():
                         else: #if possible pin has piece already, this 2nd piece being ally means can't be pinned 
                             break
                     elif(endPiece[0] == enemyColor):
-                        pieceType = endPiece[1]
+                        type = endPiece[1]
                         #there are 5 possibilities in conditional to get check
                         #1.) horizontally  away from king and piece is a rook
                         #2.) diagonally away from king, piece is bishop
@@ -169,18 +237,7 @@ class GameState():
             
             
     
-    '''
-    All moves not considering checks
-    '''
-    def getAllPossibleMoves(self):
-        moves = []
-        for i in range(len(self.board)):
-            for j in range(len(self.board[i])):
-                turn = self.board[i][j][0]
-                if(turn == 'w' and self.whiteToMove) or (turn == 'b' and not self.whiteToMove):
-                    piece = self.board[i][j][1]
-                    self.moveFunctions[piece](i,j,moves) #calls respective function based on piece
-        return moves
+    
                         
                         
     '''
