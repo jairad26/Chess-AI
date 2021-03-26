@@ -6,6 +6,9 @@ Mostly pygame focused
 import pygame as p
 
 import ChessEngine
+from tkinter import *
+from tkinter import messagebox
+
 
 WIDTH = 512
 HEIGHT = 512
@@ -85,19 +88,23 @@ def main():
                 col = location[0]//SQ_SIZE #to get col, integer divide x coord on board w size of each square 
                 row = location[1]//SQ_SIZE #to get row, integer divide y coord on board w size of each square 
                 if sqSelected == (row,col): #user clicked same square twice, so unselect
-                    spSelected = () #deselect
+                    sqSelected = () #deselect
                     playerClicks = [] #clear player clicks
                 else:
                     sqSelected = (row,col)
                     playerClicks.append(sqSelected) #append for both 1st and 2nd clicks
                 if len(playerClicks) == 2: #after 2nd click
                     move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                    print(move.getChessNotation())
-                    if move in validMoves:
-                        gs.makeMove(move)
-                        moveMade = True
-                    sqSelected = () #reset uer clicks
-                    playerClicks = []
+                    for i in range(len(validMoves)):
+                        if move == validMoves[i]:
+                            gs.makeMove(validMoves[i])
+                            print(move.getChessNotation())
+                            moveMade = True
+                            sqSelected = () #reset uer clicks
+                            playerClicks = []
+                    if not moveMade:
+                        playerClicks = [sqSelected]
+                            
             #handles keys
             elif e.type == p.KEYDOWN:
                 if e.key == p.K_z: #undo when 'z' is pressed
@@ -106,6 +113,13 @@ def main():
                     
         if moveMade:
             validMoves = gs.getValidMoves()
+            if(gs.checkMate and not gs.whiteToMove):
+                messagebox.showinfo('GAME OVER', 'WHITE WINS')
+            elif(gs.checkMate and gs.whiteToMove):
+                messagebox.showinfo('GAME OVER', 'BLACK WINS')
+            elif(gs.staleMate):
+                #print(3)
+                messagebox.showinfo('GAME OVER', 'DRAW')
             moveMade = False
                 
         drawGameState(screen,gs)
