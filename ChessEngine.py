@@ -200,8 +200,8 @@ class GameState():
     All moves considering checks
     '''
     def getValidMoves(self):
-        for log in self.castleRightsLog:
-            print(log.wks, log.wqs, log.bks, log.bqs, end = ", ")
+        # for log in self.castleRightsLog:
+        #     print(log.wks, log.wqs, log.bks, log.bqs, end = ", ")
         moves = []
         tempCastlingRights = CastlingRights(self.currentCastlingRights.wks, self.currentCastlingRights.bks, 
                                                self.currentCastlingRights.wqs, self.currentCastlingRights.bqs)
@@ -241,12 +241,13 @@ class GameState():
                 self.getKingMoves(kingRow, kingCol, moves)
             #print(len(moves))
             if(len(moves) == 0):
-                #print(1)
-                self.checkMate = True
+                if(self.inCheck):
+                    self.checkMate = True
+                else:
+                    self.staleMate = True
+                
         else: #when not in check, all moves are good
             moves = self.getAllPossibleMoves()
-            if(len(moves) == 0):
-                self.staleMate = True
             #print(moves)
         #print(moves)
         
