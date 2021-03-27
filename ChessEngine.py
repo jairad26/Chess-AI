@@ -143,7 +143,8 @@ class GameState():
                 
             #undo castling rights
             self.castleRightsLog.pop() #get rid of new castle rights from the move we are undoing
-            castleRights = copy.deepcopy(self.castleRightsLog[-1])
+            #castleRights = copy.deepcopy(self.castleRightsLog[-1])
+            castleRights = self.castleRightsLog[-1]
             self.currentCastlingRights = castleRights #set curr castle rights to the last one in the list
             
             #undo castling move
@@ -186,15 +187,15 @@ class GameState():
         if move.pieceCaptured == 'wR':
             if move.endRow == 7:
                 if move.endCol == 0:
-                    self.currentCastlingRight.wqs = False
+                    self.currentCastlingRights.wqs = False
                 elif move.endCol == 7:
-                    self.currentCastlingRight.wks = False
+                    self.currentCastlingRights.wks = False
         elif move.pieceCaptured == 'bR':
             if move.endRow == 0:
                 if move.endCol == 0:
-                    self.currentCastlingRight.bqs = False
+                    self.currentCastlingRights.bqs = False
                 elif move.endCol == 7:
-                    self.currentCastlingRight.bks = False
+                    self.currentCastlingRights.bks = False
         
     '''
     All moves considering checks
@@ -296,12 +297,12 @@ class GameState():
         
         #check out in all 8 directions for pins and checks, add pin to list
         directions = ((-1,0),(0,-1),(1,0),(0,1),(-1,-1),(-1,1),(1,-1),(1,1))
-        for i in range(len(directions)):
-            direction = directions[i]
+        for j in range(len(directions)):
+            direction = directions[j]
             possiblePin = () #reset single possible pin
-            for j in range(1,8):
-                endRow = startRow + direction[0] * j
-                endCol = startCol + direction[1] * j
+            for i in range(1,8):
+                endRow = startRow + direction[0] * i
+                endCol = startCol + direction[1] * i
                 if(0 <= endRow < 8 and 0 <= endCol < 8):
                     endPiece = self.board[endRow][endCol]
                     if(endPiece[0] == allyColor and endPiece[1] != 'K'):
@@ -322,12 +323,14 @@ class GameState():
                         #if last 4 directions (diagonal) and bishop, it's check
                         #if one square away and pawn, check to see if it is going correct direction
                             #white pieces move up the board, black pieces move down the board
-                        if(0<= i <= 3 and type == 'R') or \
-                            (4 <= i <= 7 and type == 'B') or \
-                                (j == 1 and type == 'P' and ((enemyColor == 'w' and 6 <= i <= 7) or (enemyColor == 'b' and 4 <= i <= 5))) or \
+                        if(0<= j <= 3 and type == 'R') or \
+                            (4 <= j <= 7 and type == 'B') or \
+                                (i == 1 and type == 'P' and ((enemyColor == 'w' and 6 <= j <= 7) or (enemyColor == 'b' and 4 <= j <= 5))) or \
                                     (type == 'Q') or (i == 1 and type == 'K'):
                             if possiblePin == () : #no piece blocking, so check
                                 inCheck = True
+                                # print(1)
+                                # print(type, i, j)
                                 checks.append((endRow, endCol, direction[0], direction[1]))
                                 break
                             else: #piece blocking so pin
@@ -346,6 +349,7 @@ class GameState():
                 endPiece = self.board[endRow][endCol]
                 if endPiece[0] == enemyColor and endPiece[1] == 'N': #enemy knight attacking king
                     inCheck = True
+                    # print(2)
                     checks.append((endRow, endCol, m[0], m[1]))
         return inCheck, pins, checks
                                 
