@@ -25,6 +25,8 @@ class Move():
         
         self.moveID = self.startRow*1000 + self.startCol*100 + self.endRow*10 + self.endCol*1 #kinda like masking, every move has a unique ID based on number in that pos
         
+        self.isCapture = self.pieceCaptured != '--'
+        
         
     '''
     Overriding equals method
@@ -40,3 +42,27 @@ class Move():
     
     def getRankFile(self, row, col):
         return self.colsToFiles[col] + self.rowsToRanks[row]
+    
+    '''
+    overriding str function
+    '''
+    def __str__(self):
+        #castle move
+        if self.isCastleMove:
+            return "O-O" if self.endCol == 6 else "O-O-O"
+        
+        endSquare = self.getRankFile(self.endRow, self.endCol)
+        #pawn moves
+        if self.pieceMoved[1] == 'P':
+            if self.isCapture or self.isEnpassantMove:
+                return self.colsToFiles[self.startCol] + 'x' + endSquare
+            else:
+                return endSquare
+            
+        #other piece chess notation
+        moveString = self.pieceMoved[1]
+        if self.isCapture:
+            moveString += 'x'
+        return moveString + endSquare
+    
+    #add checks, mates, diff knights moving to same square
