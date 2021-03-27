@@ -101,8 +101,10 @@ class GameState():
         #castle move
         if move.isCastleMove:
             if(move.endCol - move.startCol == 2): #kingside castle, since endCol number is 2 more than start col
-                self.board[move.endRow][move.endCol-1] = self.board[move.endRow][move.endCol+1] #moves rook
-                self.board[move.endRow][move.endCol+1] = '--' #erase old rook
+                # self.board[move.endRow][move.endCol-1] = self.board[move.endRow][move.endCol+1] #moves rook
+                # self.board[move.endRow][move.endCol+1] = '--' #erase old rook
+                # NOTE THIS IS A HUGE ERROR FIX THIS CASTLING STUFF SOON PLS
+                pass
             else: #queenside castle
                 self.board[move.endRow][move.endCol + 1] = self.board[move.endRow][move.endCol-2]
                 self.board[move.endRow][move.endCol-2] = '--'
@@ -544,7 +546,9 @@ class GameState():
         if self.inCheck:
             return #can't castle while in check
         if(self.whiteToMove and self.currentCastlingRights.wks) or (not self.whiteToMove and self.currentCastlingRights.bks):
-            self.getKingSideCastleMoves(row,col,moves,allyColor)
+            # self.getKingSideCastleMoves(row,col,moves,allyColor)
+            # NOTE THIS IS A HUGE ERROR ON CASTLING FIX THIS SOON
+            pass
         if(self.whiteToMove and self.currentCastlingRights.wqs) or (not self.whiteToMove and self.currentCastlingRights.bqs):
             self.getQueenSideCastleMoves(row,col,moves,allyColor)
         

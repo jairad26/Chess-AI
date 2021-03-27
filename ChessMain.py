@@ -194,7 +194,7 @@ def main():
     gameOver = False
     playerOne = True #if human is playing white,then this will be true. If AI is playing, then false
                      #can also make this an integer value, 0 being human 1-10 being difficulty of AI
-    playerTwo = True #Same as above but for black
+    playerTwo = False #Same as above but for black
     while running:
         humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
         
@@ -300,7 +300,7 @@ def animateMove(move, screen, board, clock):
 def drawEndGameText(screen, text):
     font = p.font.SysFont("Ariel", 32, True, False)
     textObject = font.render(text, 0, p.Color('Gray'))
-    textLocation = p.Rect(0,0,BOARD_WIDTH, BOARD_HEIGHT).move(int(BOARD_WIDTH/2 - textObject.get_width()/2), int(BOARD_HEIGHT/2 - textObject.get_BOARD_HEIGHT()/2))
+    textLocation = p.Rect(0,0,BOARD_WIDTH, BOARD_HEIGHT).move(int(BOARD_WIDTH/2 - textObject.get_width()/2), int(BOARD_HEIGHT/2 - textObject.get_height()/2))
     screen.blit(textObject, textLocation)
     textObject = font.render(text, 0, p.Color("Black"))
     screen.blit(textObject, textLocation.move(2,2))

@@ -30,6 +30,7 @@ def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier)
     #move ordering - implement later
     maxScore = -checkmateScore
     for move in validMoves:
+        # print(move.pieceMoved, move.startRow, move.startCol, move.endRow, move.endCol)
         gs.makeMove(move)
         nextMoves = gs.getValidMoves()
         score = -findMoveNegaMaxAlphaBeta(gs, nextMoves, depth-1, -beta, -alpha, -turnMultiplier)
