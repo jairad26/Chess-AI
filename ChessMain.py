@@ -218,7 +218,7 @@ def main():
                         for i in range(len(validMoves)):
                             if move == validMoves[i]:
                                 gs.makeMove(validMoves[i])
-                                print(str(move))
+                                print(str(gs.moveLog[-1]))
                                 moveMade = True
                                 animate = True
                                 prevSqSelected = playerClicks[-1]
@@ -251,7 +251,7 @@ def main():
             if AIMove is None:
                 AIMove = chessAI.findRandomMove(validMoves)
             gs.makeMove(AIMove)
-            print(str(AIMove))
+            print(str(gs.moveLog[-1]))
             moveMade = True
             animate = True
         
