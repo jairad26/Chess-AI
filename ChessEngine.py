@@ -60,33 +60,36 @@ class GameState():
             
         #pawn promotion
         elif move.pieceMoved == 'wP' and move.endRow == 0:
-            while(promotionPiece == ''):
-                promotionPiece = input('\n What would you like to promote to? NOTE: You CAN NOT undo a promotion! \n')
-                if(promotionPiece == 'Q'):
-                    self.board[move.endRow][move.endCol] = 'wQ'
-                elif(promotionPiece == 'N'):
-                    self.board[move.endRow][move.endCol] = 'wN'
-                elif(promotionPiece == 'B'):
-                    self.board[move.endRow][move.endCol] = 'wB'
-                elif(promotionPiece == 'R'):
-                    self.board[move.endRow][move.endCol] = 'wR'
-                else:
-                    promotionPiece = ''
-                    print('invalid input, try again')
+            self.board[move.endRow][move.endCol] = 'wQ'
+            # while(promotionPiece == ''):
+            #     promotionPiece = input('\n What would you like to promote to? NOTE: You CAN NOT undo a promotion! \n')
+            #     if(promotionPiece == 'Q'):
+            #         self.board[move.endRow][move.endCol] = 'wQ'
+            #     elif(promotionPiece == 'N'):
+            #         self.board[move.endRow][move.endCol] = 'wN'
+            #     elif(promotionPiece == 'B'):
+            #         self.board[move.endRow][move.endCol] = 'wB'
+            #     elif(promotionPiece == 'R'):
+            #         self.board[move.endRow][move.endCol] = 'wR'
+            #     else:
+            #         promotionPiece = ''
+            #         print('invalid input, try again')
         elif move.pieceMoved == 'bP' and move.endRow == 7:
-            while(promotionPiece == ''):
-                promotionPiece = input('\n What would you like to promote to? NOTE: You CAN NOT undo a promotion! \n')
-                if(promotionPiece == 'Q'):
-                    self.board[move.endRow][move.endCol] = 'bQ'
-                elif(promotionPiece == 'N'):
-                    self.board[move.endRow][move.endCol] = 'bN'
-                elif(promotionPiece == 'B'):
-                    self.board[move.endRow][move.endCol] = 'bB'
-                elif(promotionPiece == 'R'):
-                    self.board[move.endRow][move.endCol] = 'bR'
-                else:
-                    promotionPiece = ''
-                    print('invalid input, try again')
+            move.isPawnPromotion = True
+            self.board[move.endRow][move.endCol] = 'bQ'
+            # while(promotionPiece == ''):
+            #     promotionPiece = input('\n What would you like to promote to? NOTE: You CAN NOT undo a promotion! \n')
+            #     if(promotionPiece == 'Q'):
+            #         self.board[move.endRow][move.endCol] = 'bQ'
+            #     elif(promotionPiece == 'N'):
+            #         self.board[move.endRow][move.endCol] = 'bN'
+            #     elif(promotionPiece == 'B'):
+            #         self.board[move.endRow][move.endCol] = 'bB'
+            #     elif(promotionPiece == 'R'):
+            #         self.board[move.endRow][move.endCol] = 'bR'
+            #     else:
+            #         promotionPiece = ''
+            #         print('invalid input, try again')
         
         #enpassant move
         if move.isEnpassantMove:
@@ -123,43 +126,54 @@ class GameState():
     def undoMove(self):
         if len(self.moveLog) != 0: #make sure there is a move to undo
             move = self.moveLog.pop()
-            self.board[move.startRow][move.startCol] = move.pieceMoved
-            self.board[move.endRow][move.endCol] = move.pieceCaptured 
-            self.whiteToMove = not self.whiteToMove #prev person's turn
-            #update king's position
-            if move.pieceMoved == 'wK':
-                self.whiteKingLocation = (move.endRow, move.endCol)
-            elif move.pieceMoved == 'bK':
-                self.blackKingLocation = (move.endRow, move.endCol)
-            #undo en passant
-            if move.isEnpassantMove:
-                self.board[move.endRow][move.endCol] = '--' #leave ending square blank
-                self.board[move.startRow][move.endCol] = move.pieceCaptured
-                # self.enpassantPossible = (move.endRow, move.endCol)
-                if(self.whiteToMove):
-                    self.board[move.startRow][move.endCol] = 'bP' #uncapturing the pawn
-                else:
-                    self.board[move.startRow][move.endCol] = 'wP' #uncapturing the pawn
-                
-            # #undo a 2 square pawn avance
-            # if(move.pieceMoved[1] == 'P' and abs(move.startRow-move.endRow)==2):
-            #     self.enpassantPossible = ()
-            self.enpassantPossibleLog.pop()
-            self.enpassantPossible = self.enpassantPossibleLog[-1]    
-            #undo castling rights
-            self.castleRightsLog.pop() #get rid of new castle rights from the move we are undoing
-            #castleRights = copy.deepcopy(self.castleRightsLog[-1])
-            castleRights = self.castleRightsLog[-1]
-            self.currentCastlingRights = CastlingRights(castleRights.wks, castleRights.bks, castleRights.wqs, castleRights.bqs) #set curr castle rights to the last one in the list
             
-            #undo castling move
-            if move.isCastleMove:
-                if move.endCol - move.startCol == 2: #kingside
-                    self.board[move.endRow][move.endCol + 1] = self.board[move.endRow][move.endCol-1]
-                    self.board[move.endRow][move.endCol - 1] = '--'
-                else: #queenside
-                    self.board[move.endRow][move.endCol-2] = self.board[move.endRow][move.endCol+1]
-                    self.board[move.endRow][move.endCol+1] = '--'
+            #undo pawn promotion
+            if move.isPawnPromotion:
+                allyColor = move.pieceMoved[1]
+                self.board[move.startRow][move.startCol] = 'wP' if allyColor == 'w' else 'bP'
+                self.board[move.endRow][move.endCol] = move.pieceCaptured
+                self.whiteToMove = not self.whiteToMove #prev person's turn
+            else:
+                self.board[move.startRow][move.startCol] = move.pieceMoved
+                self.board[move.endRow][move.endCol] = move.pieceCaptured 
+                self.whiteToMove = not self.whiteToMove #prev person's turn
+                #update king's position
+                if move.pieceMoved == 'wK':
+                    self.whiteKingLocation = (move.endRow, move.endCol)
+                elif move.pieceMoved == 'bK':
+                    self.blackKingLocation = (move.endRow, move.endCol)
+                #undo en passant
+                if move.isEnpassantMove:
+                    self.board[move.endRow][move.endCol] = '--' #leave ending square blank
+                    self.board[move.startRow][move.endCol] = move.pieceCaptured
+                    # self.enpassantPossible = (move.endRow, move.endCol)
+                    if(self.whiteToMove):
+                        self.board[move.startRow][move.endCol] = 'bP' #uncapturing the pawn
+                    else:
+                        self.board[move.startRow][move.endCol] = 'wP' #uncapturing the pawn
+                    
+                # #undo a 2 square pawn avance
+                # if(move.pieceMoved[1] == 'P' and abs(move.startRow-move.endRow)==2):
+                #     self.enpassantPossible = ()
+                self.enpassantPossibleLog.pop()
+                self.enpassantPossible = self.enpassantPossibleLog[-1]    
+                #undo castling rights
+                self.castleRightsLog.pop() #get rid of new castle rights from the move we are undoing
+                #castleRights = copy.deepcopy(self.castleRightsLog[-1])
+                castleRights = self.castleRightsLog[-1]
+                self.currentCastlingRights = CastlingRights(castleRights.wks, castleRights.bks, castleRights.wqs, castleRights.bqs) #set curr castle rights to the last one in the list
+                
+                #undo castling move
+                if move.isCastleMove:
+                    if move.endCol - move.startCol == 2: #kingside
+                        self.board[move.endRow][move.endCol + 1] = self.board[move.endRow][move.endCol-1]
+                        self.board[move.endRow][move.endCol - 1] = '--'
+                    else: #queenside
+                        self.board[move.endRow][move.endCol-2] = self.board[move.endRow][move.endCol+1]
+                        self.board[move.endRow][move.endCol+1] = '--'
+                    
+            
+                
             
             
             self.checkMate = False
@@ -354,7 +368,7 @@ class GameState():
                 endPiece = self.board[endRow][endCol]
                 if endPiece[0] == enemyColor and endPiece[1] == 'N': #enemy knight attacking king
                     inCheck = True
-                    # print(2)
+                    print(2)
                     checks.append((endRow, endCol, m[0], m[1]))
         return inCheck, pins, checks
                                 

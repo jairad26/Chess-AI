@@ -11,13 +11,15 @@ class Move():
     
     colsToFiles = {v: k for k, v in filesToCols.items()}
     
-    def __init__(self, startSq, endSq, board, isEnpassantMove = False, isCastleMove = False):
+    def __init__(self, startSq, endSq, board, isPawnPromotion = False, isEnpassantMove = False, isCastleMove = False):
         self.startRow = startSq[0]
         self.startCol = startSq[1]
         self.endRow = endSq[0]
         self.endCol = endSq[1]
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
+        
+        self.isPawnPromotion = isPawnPromotion
         
         self.isEnpassantMove = isEnpassantMove
         

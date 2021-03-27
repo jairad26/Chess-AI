@@ -192,11 +192,11 @@ def main():
     secondPrevSqSelected = ()
     playerClicks = [] #keeps track of player clicks (two tuples: [(6,4),(4,4)])
     gameOver = False
-    playerOne = True #if human is playing white,then this will be true. If AI is playing, then false
+    playerOne = -1 #if human is playing white,then this will be true. If AI is playing, then false
                      #can also make this an integer value, 0 being human 1-10 being difficulty of AI
-    playerTwo = False #Same as above but for black
+    playerTwo = 3 #Same as above but for black
     while running:
-        humanTurn = (gs.whiteToMove and playerOne) or (not gs.whiteToMove and playerTwo)
+        humanTurn = (gs.whiteToMove and playerOne == -1) or (not gs.whiteToMove and playerTwo == -1)
         
         for e in p.event.get():
             if e.type == p.QUIT:
@@ -247,7 +247,10 @@ def main():
                     
         #Chess AI
         if not gameOver and not humanTurn:
-            AIMove = chessAI.findBestMove(gs, validMoves)
+            if gs.whiteToMove:
+                AIMove = chessAI.findBestMove(gs, validMoves, playerOne)
+            else:
+                AIMove = chessAI.findBestMove(gs, validMoves, playerTwo)
             if AIMove is None:
                 AIMove = chessAI.findRandomMove(validMoves)
             gs.makeMove(AIMove)

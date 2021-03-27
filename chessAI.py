@@ -1,27 +1,27 @@
 import random
 from tkinter.constants import S
 
-pieceScore = {'K': 0, 'Q': 9, 'R': 5, 'B': 3, 'N': 3, 'P': 1}
+pieceScore = {'K': 0, 'Q': 900, 'R': 500, 'B': 300, 'N': 300, 'P': 100}
 checkmateScore = 1000
 stalemateScore = 0
-DEPTH = 3
 
 
 '''
 helper method to make first recursive call
 '''
-def findBestMove(gs, validMoves):
+def findBestMove(gs, validMoves, DEPTH):
     global nextMove, counter
     nextMove = None
     random.shuffle(validMoves)
-    # findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove)
-    # findMoveNegaMax(gs, validMoves, DEPTH, 1 if gs.whiteToMove else -1)
     counter = 0
-    findMoveNegaMaxAlphaBeta(gs, validMoves, DEPTH, -checkmateScore, checkmateScore, 1 if gs.whiteToMove else -1)
+    # findMoveMinMax(gs, validMoves, DEPTH, gs.whiteToMove, DEPTH)
+    # findMoveNegaMax(gs, validMoves, DEPTH, 1 if gs.whiteToMove else -1, DEPTH)
+    
+    findMoveNegaMaxAlphaBeta(gs, validMoves, DEPTH, -checkmateScore, checkmateScore, 1 if gs.whiteToMove else -1, DEPTH)
     print(counter)
     return nextMove
 
-def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier):
+def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier, DEPTH):
     global nextMove, counter
     counter += 1
     if depth == 0:
@@ -33,7 +33,7 @@ def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier)
         # print(move.pieceMoved, move.startRow, move.startCol, move.endRow, move.endCol)
         gs.makeMove(move)
         nextMoves = gs.getValidMoves()
-        score = -findMoveNegaMaxAlphaBeta(gs, nextMoves, depth-1, -beta, -alpha, -turnMultiplier)
+        score = -findMoveNegaMaxAlphaBeta(gs, nextMoves, depth-1, -beta, -alpha, -turnMultiplier, DEPTH)
         if score > maxScore:
             maxScore = score
             if depth == DEPTH:
@@ -50,7 +50,7 @@ def findMoveNegaMaxAlphaBeta(gs, validMoves, depth, alpha, beta, turnMultiplier)
 '''
 min max w recursion
 '''
-def findMoveMinMax(gs, validMoves, depth, whiteToMove):
+def findMoveMinMax(gs, validMoves, depth, whiteToMove, DEPTH):
     global nextMove
     if depth == 0:
         return scoreMaterial(gs.board)
@@ -60,7 +60,7 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
         for move in validMoves:
             gs.makeMove(move)
             nextMoves = gs.getValidMoves()
-            score = findMoveMinMax(gs, nextMoves, depth-1, False)
+            score = findMoveMinMax(gs, nextMoves, depth-1, False, DEPTH)
             if score > maxScore:
                 maxScore = score
                 if depth == DEPTH:
@@ -72,7 +72,7 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
         for move in validMoves:
             gs.makeMove(move)
             nextMoves = gs.getValidMoves()
-            score = findMoveMinMax(gs, nextMoves, depth-1, True)
+            score = findMoveMinMax(gs, nextMoves, depth-1, True, DEPTH)
             if score < minScore:
                 minScore = score
                 if depth == DEPTH:
@@ -83,8 +83,9 @@ def findMoveMinMax(gs, validMoves, depth, whiteToMove):
 '''
 negamax, recursion
 '''
-def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
-    global nextMove
+def findMoveNegaMax(gs, validMoves, depth, turnMultiplier, DEPTH):
+    global nextMove, counter
+    counter += 1
     if depth == 0:
         return turnMultiplier * scoreBoard(gs)
     
@@ -92,7 +93,7 @@ def findMoveNegaMax(gs, validMoves, depth, turnMultiplier):
     for move in validMoves:
         gs.makeMove(move)
         nextMoves = gs.getValidMoves()
-        score = -findMoveNegaMax(gs, nextMoves, depth-1, -turnMultiplier)
+        score = -findMoveNegaMax(gs, nextMoves, depth-1, -turnMultiplier, DEPTH)
         if score > maxScore:
             maxScore = score
             if depth == DEPTH:
@@ -178,3 +179,15 @@ def scoreMaterial(board):
                 score -= pieceScore[square[1]]
                 
     return score
+
+
+
+def orderMoves(gs, validMoves):
+    for move in validMoves:
+        moveScoreGuess = 0
+        if(move.pieceCaptured != "--"):
+            moveScoreGuess = 10 * pieceScore[move.pieceCaptured[1]] - pieceScore[move.pieceMoved[1]]
+            
+        if(move.isPawnPromotion):
+            moveScoreGuess += pieceScore['Q']
+            
