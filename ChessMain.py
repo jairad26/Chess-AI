@@ -194,7 +194,7 @@ def main():
     gameOver = False
     playerOne = -1 #if human is playing white,then this will be true. If AI is playing, then false
                      #can also make this an integer value, 0 being human 1-10 being difficulty of AI
-    playerTwo = 3 #Same as above but for black
+    playerTwo = -1 #Same as above but for black
     while running:
         humanTurn = (gs.whiteToMove and playerOne == -1) or (not gs.whiteToMove and playerTwo == -1)
         
@@ -252,7 +252,10 @@ def main():
             else:
                 AIMove = chessAI.findBestMove(gs, validMoves, playerTwo)
             if AIMove is None:
-                AIMove = chessAI.findRandomMove(validMoves)
+                if(len(validMoves) != 0):
+                    AIMove = chessAI.findRandomMove(validMoves)
+                else:
+                    break
             gs.makeMove(AIMove)
             print(str(gs.moveLog[-1]))
             moveMade = True
