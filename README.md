@@ -1,2 +1,2 @@
 # Chess-AI
-Create chess game using PyGame, create Chess Bot using ML and chess specific algorithms
+Fully functioning 2 player chess game, currently implementing engine which uses NegaMax and Alpha Beta pruning
